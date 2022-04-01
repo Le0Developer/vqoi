@@ -71,11 +71,15 @@ pub fn decode(data []byte) ?Image {
 				$if vqoi_debug ? {
 					eprintln('decode: => $last_pixel')
 				}
+				// TODO: wait for fix: https://github.com/vlang/v/issues/13895
+				// pixels << last_pixel
 				pixels << [last_pixel[0], last_pixel[1], last_pixel[2], last_pixel[3]]!
 			}
 			offset++
 			continue
 		}
+		// TODO: wait for fix: https://github.com/vlang/v/issues/13895
+		// pixels << new_pixel
 		pixels << [new_pixel[0], new_pixel[1], new_pixel[2], new_pixel[3]]!
 		$if vqoi_debug ? {
 			eprintln('decode: => $new_pixel (${pixels.last()})')
