@@ -1,0 +1,9 @@
+# Binaries for programs and plugins
+main
+*.exe
+*.exe~
+*.so
+*.dylib
+*.dll
+vls.log
+hello.qoi
