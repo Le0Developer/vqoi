@@ -14,13 +14,13 @@ import vqoi
 import os
 
 fn main() {
-    width := 500
-    height := 400
-    rgba := [][4]byte{len: width * height, init: [byte(255), 0, 0, 255]!}
-    metadata := vqoi.ImageMetadata{u32(width), u32(height), .rgba, .srgb}
-    image := vqoi.Image{rgba, metadata}
-    data := vqoi.encode(image)
-    os.write_file('hello.qoi', data.bytestr()) ?
+	width := 500
+	height := 400
+	rgba := [][4]byte{len: width * height, init: [byte(255), 0, 0, 255]!}
+	metadata := vqoi.ImageMetadata{u32(width), u32(height), .rgba, .srgb}
+	image := vqoi.Image{rgba, metadata}
+	data := vqoi.encode(image)
+	os.write_file('hello.qoi', data.bytestr()) ?
 
 	decoded_image := vqoi.decode(data) ?
 	assert decoded_image == image
