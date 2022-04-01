@@ -7,3 +7,4 @@ main
 *.dll
 vls.log
 hello.qoi
+.DS_Store
