@@ -40,17 +40,21 @@ pub fn metadata_from_header(data []u8) !ImageMetadata {
 	width := binary.big_endian_u32(data[4..8])
 	height := binary.big_endian_u32(data[8..12])
 
-	channels := data[12]
-	colorspace := data[13]
+	mut channels := Channel.rgb
+	mut colorspace := ColorSpace.linear
 
-	if channels != 3 && channels != 4 {
-		return error('only supports channels 3 or 4, not ${channels}')
+	match data[12] {
+		3 { channels = .rgb }
+		4 { channels = .rgba }
+		else { return error('only supports channels 3 or 4, not ${data[12]}') }
 	}
-	if colorspace != 0 && colorspace != 1 {
-		return error('only supports colorspaces 0 or 1, not ${colorspace}')
+	match data[13] {
+		0 { colorspace = .srgb }
+		1 { colorspace = .linear }
+		else { return error('only supports colorspaces 0 or 1, not ${colorspace}') }
 	}
 
-	return unsafe { ImageMetadata{width, height, Channel(channels), ColorSpace(colorspace)} }
+	return ImageMetadata{width, height, channels, colorspace} 
 }
 
 pub enum Channel {
