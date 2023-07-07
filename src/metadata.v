@@ -34,7 +34,7 @@ pub fn (img ImageMetadata) as_header() []u8 {
 pub fn metadata_from_header(data []u8) !ImageMetadata {
 	for i, value in magic_header {
 		if data[i] != value {
-			return error('image is missing magic header u8s')
+			return error('image is missing magic header bytes')
 		}
 	}
 	width := binary.big_endian_u32(data[4..8])
@@ -44,10 +44,10 @@ pub fn metadata_from_header(data []u8) !ImageMetadata {
 	colorspace := data[13]
 
 	if channels != 3 && channels != 4 {
-		return error('only supports channels 3 or 4, not $channels')
+		return error('only supports channels 3 or 4, not ${channels}')
 	}
 	if colorspace != 0 && colorspace != 1 {
-		return error('only supports colorspaces 0 or 1, not $colorspace')
+		return error('only supports colorspaces 0 or 1, not ${colorspace}')
 	}
 
 	return unsafe { ImageMetadata{width, height, Channel(channels), ColorSpace(colorspace)} }
