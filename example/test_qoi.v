@@ -22,5 +22,4 @@ fn try_file(filename string) ! {
 	if data != encoded {
 		return error('does not match')
 	}
-	// assert data == encoded
 }
