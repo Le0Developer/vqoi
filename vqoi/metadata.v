@@ -2,9 +2,6 @@ module vqoi
 
 import encoding.binary
 
-// "qoif"
-const magic_header = [byte(113), 111, 105, 102]
-
 
 pub struct ImageMetadata {
 pub mut:
@@ -32,10 +29,8 @@ pub fn (img ImageMetadata) as_header() []byte {
 
 
 pub fn metadata_from_header(data []byte) ?ImageMetadata {
-	for i, value in magic_header {
-		if data[i] != value {
-			return error('image is missing magic header bytes')
-		}
+	if data[..4] != magic_header {
+		return error('image is missing magic header bytes')
 	}
 	width := binary.big_endian_u32(data[4..8])
 	height := binary.big_endian_u32(data[8..12])
