@@ -8,10 +8,10 @@ import vqoi
 fn main() {
 	for arg in os.args[1..] {
 		try_file(arg) or {
-			println('[FAILED ] $arg: $err')
+			println('[FAILED ] ${arg}: ${err}')
 			continue
 		}
-		println('[SUCCESS] $arg')
+		println('[SUCCESS] ${arg}')
 	}
 }
 

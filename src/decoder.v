@@ -7,7 +7,7 @@ pub fn decode(data []u8) !Image {
 	metadata := metadata_from_header(data) or { return err }
 
 	total_pixels := int(metadata.height * metadata.width)
-	mut pixels := [][4]u8{ cap: total_pixels }
+	mut pixels := [][4]u8{cap: total_pixels}
 	mut array := [64][4]u8{}
 	mut offset := 14
 
@@ -78,7 +78,7 @@ pub fn decode(data []u8) !Image {
 		}
 		pixels << new_pixel
 		$if vqoi_debug ? {
-			eprintln('decode: => $new_pixel (${pixels.last()})')
+			eprintln('decode: => ${new_pixel} (${pixels.last()})')
 		}
 		array[color_hash(new_pixel)] = new_pixel
 		last_pixel = new_pixel

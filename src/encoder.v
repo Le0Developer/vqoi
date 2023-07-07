@@ -1,6 +1,5 @@
 module vqoi
 
-
 pub fn encode(image Image) []u8 {
 	mut result := []u8{}
 	result << image.metadata.as_header()
@@ -11,7 +10,7 @@ pub fn encode(image Image) []u8 {
 	mut run := u8(0)
 	for pixel in image.rgba {
 		$if vqoi_debug ? {
-			eprintln('encode: pos: $result.len, pixel: $pixel')
+			eprintln('encode: pos: ${result.len}, pixel: ${pixel}')
 		}
 		// QOI_OP_RUN
 		if pixel == last_pixel {
@@ -19,7 +18,7 @@ pub fn encode(image Image) []u8 {
 			// 62 and 63 are reserved for QOI_OP_RGB and QOI_OP_RGBA
 			if run > 61 {
 				$if vqoi_debug ? {
-					eprintln('encode: QOI_OP_RUN, len=$run (premature restart)')
+					eprintln('encode: QOI_OP_RUN, len=${run} (premature restart)')
 				}
 				result << (0b11 << 6 | (run - 1))
 				run = 0
@@ -27,7 +26,7 @@ pub fn encode(image Image) []u8 {
 			continue
 		} else if run > 0 {
 			$if vqoi_debug ? {
-				eprintln('encode: QOI_OP_RUN, len=$run ')
+				eprintln('encode: QOI_OP_RUN, len=${run} ')
 			}
 			result << (0b11 << 6 | (run - 1))
 			run = 0
@@ -57,12 +56,12 @@ pub fn encode(image Image) []u8 {
 
 			if vr > -3 && vr < 2 && vg > -3 && vg < 2 && vb > -3 && vb < 2 { // QOI_OP_DIFF
 				$if vqoi_debug ? {
-					eprintln('encode: QOI_OP_DIFF, vr: $vr, vg: $vg, vb: $vb')
+					eprintln('encode: QOI_OP_DIFF, vr: ${vr}, vg: ${vg}, vb: ${vb}')
 				}
 				result << (0b01 << 6 | u8(vr + 2) << 4 | u8(vg + 2) << 2 | u8(vb + 2))
 			} else if vg_r > -9 && vg_r < 8 && vg > -33 && vg < 32 && vg_b > -9 && vg_b < 8 { // QOI_LUME
 				$if vqoi_debug ? {
-					eprintln('encode: QOI_OP_LUME, vg: $vg, vg_r: $vg_r, vg_b: $vg_b')
+					eprintln('encode: QOI_OP_LUME, vg: ${vg}, vg_r: ${vg_r}, vg_b: ${vg_b}')
 				}
 				result << (0b10 << 6 | u8(vg + 32))
 				result << (u8(vg_r + 8) << 4 | u8(vg_b + 8))
@@ -82,7 +81,7 @@ pub fn encode(image Image) []u8 {
 
 	if run > 0 {
 		$if vqoi_debug ? {
-			eprintln('encode: QOI_OP_RUN, len=$run (exit)')
+			eprintln('encode: QOI_OP_RUN, len=${run} (exit)')
 		}
 		result << 0b11 << 6 | (run - 1)
 	}

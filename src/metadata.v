@@ -5,11 +5,10 @@ import encoding.binary
 // "qoif"
 const magic_header = [u8(113), 111, 105, 102]
 
-
 pub struct ImageMetadata {
 pub mut:
-	width  u32
-	height u32
+	width      u32
+	height     u32
 	channels   Channel
 	colorspace ColorSpace
 }
@@ -29,7 +28,6 @@ pub fn (img ImageMetadata) as_header() []u8 {
 
 	return data
 }
-
 
 pub fn metadata_from_header(data []u8) !ImageMetadata {
 	for i, value in magic_header {
@@ -54,7 +52,7 @@ pub fn metadata_from_header(data []u8) !ImageMetadata {
 		else { return error('only supports colorspaces 0 or 1, not ${data[13]}') }
 	}
 
-	return ImageMetadata{width, height, channels, colorspace} 
+	return ImageMetadata{width, height, channels, colorspace}
 }
 
 pub enum Channel {
