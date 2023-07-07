@@ -1,23 +1,23 @@
 module vqoi
 
-pub fn decode(data []byte) ?Image {
+pub fn decode(data []u8) !Image {
 	if data.len < 14 {
 		return error('missing header')
 	}
-	metadata := metadata_from_header(data) ?
+	metadata := metadata_from_header(data) or { return err }
 
 	total_pixels := int(metadata.height * metadata.width)
-	mut pixels := [][4]byte{ cap: total_pixels }
-	mut array := [64][4]byte{}
+	mut pixels := [][4]u8{cap: total_pixels}
+	mut array := [64][4]u8{}
 	mut offset := 14
 
-	mut last_pixel := [byte(0), 0, 0, 255]!
+	mut last_pixel := [u8(0), 0, 0, 255]!
 
 	for offset < data.len - 8 && pixels.len < total_pixels {
 		current_byte := data[offset]
-		mut new_pixel := [4]byte{}
+		mut new_pixel := [4]u8{}
 		$if vqoi_debug ? {
-			eprintln('decode: pos: $offset / $data.len, value: $current_byte')
+			eprintln('decode: pos: ${offset} / ${data.len}, value: ${current_byte}')
 		}
 		if current_byte == 0b1111_1110 { // QOI_OP_RGB
 			$if vqoi_debug ? {
@@ -69,7 +69,7 @@ pub fn decode(data []byte) ?Image {
 			}
 			for _ in 0 .. 1 + current_byte & 0b0011_1111 {
 				$if vqoi_debug ? {
-					eprintln('decode: => $last_pixel')
+					eprintln('decode: => ${last_pixel}')
 				}
 				pixels << last_pixel
 			}
@@ -78,7 +78,7 @@ pub fn decode(data []byte) ?Image {
 		}
 		pixels << new_pixel
 		$if vqoi_debug ? {
-			eprintln('decode: => $new_pixel (${pixels.last()})')
+			eprintln('decode: => ${new_pixel} (${pixels.last()})')
 		}
 		array[color_hash(new_pixel)] = new_pixel
 		last_pixel = new_pixel
