@@ -51,7 +51,7 @@ pub fn metadata_from_header(data []u8) !ImageMetadata {
 	match data[13] {
 		0 { colorspace = .srgb }
 		1 { colorspace = .linear }
-		else { return error('only supports colorspaces 0 or 1, not ${colorspace}') }
+		else { return error('only supports colorspaces 0 or 1, not ${data[13]}') }
 	}
 
 	return ImageMetadata{width, height, channels, colorspace} 
