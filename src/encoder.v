@@ -1,14 +1,14 @@
 module vqoi
 
 
-pub fn encode(image Image) []byte {
-	mut result := []byte{}
+pub fn encode(image Image) []u8 {
+	mut result := []u8{}
 	result << image.metadata.as_header()
 
-	mut array := [64][4]byte{}
-	mut last_pixel := [byte(0), 0, 0, 255]!
+	mut array := [64][4]u8{}
+	mut last_pixel := [u8(0), 0, 0, 255]!
 
-	mut run := byte(0)
+	mut run := u8(0)
 	for pixel in image.rgba {
 		$if vqoi_debug ? {
 			eprintln('encode: pos: $result.len, pixel: $pixel')
@@ -59,13 +59,13 @@ pub fn encode(image Image) []byte {
 				$if vqoi_debug ? {
 					eprintln('encode: QOI_OP_DIFF, vr: $vr, vg: $vg, vb: $vb')
 				}
-				result << (0b01 << 6 | byte(vr + 2) << 4 | byte(vg + 2) << 2 | byte(vb + 2))
+				result << (0b01 << 6 | u8(vr + 2) << 4 | u8(vg + 2) << 2 | u8(vb + 2))
 			} else if vg_r > -9 && vg_r < 8 && vg > -33 && vg < 32 && vg_b > -9 && vg_b < 8 { // QOI_LUME
 				$if vqoi_debug ? {
 					eprintln('encode: QOI_OP_LUME, vg: $vg, vg_r: $vg_r, vg_b: $vg_b')
 				}
-				result << (0b10 << 6 | byte(vg + 32))
-				result << (byte(vg_r + 8) << 4 | byte(vg_b + 8))
+				result << (0b10 << 6 | u8(vg + 32))
+				result << (u8(vg_r + 8) << 4 | u8(vg_b + 8))
 			} else { // QOI_OP_RGB
 				$if vqoi_debug ? {
 					eprintln('encode: QOI_OP_RGB')
@@ -86,6 +86,6 @@ pub fn encode(image Image) []byte {
 		}
 		result << 0b11 << 6 | (run - 1)
 	}
-	result << [byte(0), 0, 0, 0, 0, 0, 0, 1] // magic ending
+	result << [u8(0), 0, 0, 0, 0, 0, 0, 1] // magic ending
 	return result
 }

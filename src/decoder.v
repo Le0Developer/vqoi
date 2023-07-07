@@ -1,25 +1,25 @@
 module vqoi
 
-pub fn decode(data []byte) ?Image {
+pub fn decode(data []u8) !Image {
 	if data.len < 14 {
 		return error('missing header')
 	}
-	metadata := metadata_from_header(data) ?
+	metadata := metadata_from_header(data) or { return err }
 
 	total_pixels := int(metadata.height * metadata.width)
-	mut pixels := [][4]byte{ cap: total_pixels }
-	mut array := [64][4]byte{}
+	mut pixels := [][4]u8{ cap: total_pixels }
+	mut array := [64][4]u8{}
 	mut offset := 14
 
-	mut last_pixel := [byte(0), 0, 0, 255]!
+	mut last_pixel := [u8(0), 0, 0, 255]!
 
 	for offset < data.len - 8 && pixels.len < total_pixels {
-		current_byte := data[offset]
-		mut new_pixel := [4]byte{}
+		current_u8 := data[offset]
+		mut new_pixel := [4]u8{}
 		$if vqoi_debug ? {
-			eprintln('decode: pos: $offset / $data.len, value: $current_byte')
+			eprintln('decode: pos: $offset / $data.len, value: $current_u8')
 		}
-		if current_byte == 0b1111_1110 { // QOI_OP_RGB
+		if current_u8 == 0b1111_1110 { // QOI_OP_RGB
 			$if vqoi_debug ? {
 				eprintln('decode: QOI_OP_RGB')
 			}
@@ -28,7 +28,7 @@ pub fn decode(data []byte) ?Image {
 			new_pixel[2] = data[offset + 3]
 			new_pixel[3] = last_pixel[3]
 			offset += 4
-		} else if current_byte == 0b1111_1111 { // QOI_OP_RGBA
+		} else if current_u8 == 0b1111_1111 { // QOI_OP_RGBA
 			$if vqoi_debug ? {
 				eprintln('decode: QOI_OP_RGBA')
 			}
@@ -37,37 +37,37 @@ pub fn decode(data []byte) ?Image {
 			new_pixel[2] = data[offset + 3]
 			new_pixel[3] = data[offset + 4]
 			offset += 5
-		} else if current_byte >> 6 == 0b00 { // QOI_OP_INDEX
+		} else if current_u8 >> 6 == 0b00 { // QOI_OP_INDEX
 			$if vqoi_debug ? {
 				eprintln('decode: QOI_OP_INDEX')
 			}
-			new_pixel = array[current_byte]
+			new_pixel = array[current_u8]
 			offset++
-		} else if current_byte >> 6 == 0b01 { // QOI_OP_DIFF
+		} else if current_u8 >> 6 == 0b01 { // QOI_OP_DIFF
 			$if vqoi_debug ? {
 				eprintln('decode: QOI_OP_DIFF')
 			}
-			new_pixel[0] = last_pixel[0] + (current_byte >> 4 & 0b0000_0011) - 2
-			new_pixel[1] = last_pixel[1] + (current_byte >> 2 & 0b0000_0011) - 2
-			new_pixel[2] = last_pixel[2] + (current_byte & 0b11) - 2
+			new_pixel[0] = last_pixel[0] + (current_u8 >> 4 & 0b0000_0011) - 2
+			new_pixel[1] = last_pixel[1] + (current_u8 >> 2 & 0b0000_0011) - 2
+			new_pixel[2] = last_pixel[2] + (current_u8 & 0b11) - 2
 			new_pixel[3] = last_pixel[3]
 			offset++
-		} else if current_byte >> 6 == 0b10 { // QOI_OP_LUME
+		} else if current_u8 >> 6 == 0b10 { // QOI_OP_LUME
 			$if vqoi_debug ? {
 				eprintln('decode: QOI_OP_LUME')
 			}
-			next_byte := data[offset + 1]
-			vg := (current_byte & 0x3f) - 32
-			new_pixel[0] = last_pixel[0] + vg - 8 + (next_byte >> 4 & 0b0000_1111)
+			next_u8 := data[offset + 1]
+			vg := (current_u8 & 0x3f) - 32
+			new_pixel[0] = last_pixel[0] + vg - 8 + (next_u8 >> 4 & 0b0000_1111)
 			new_pixel[1] = last_pixel[1] + vg
-			new_pixel[2] = last_pixel[2] + vg - 8 + (next_byte & 0b0000_1111)
+			new_pixel[2] = last_pixel[2] + vg - 8 + (next_u8 & 0b0000_1111)
 			new_pixel[3] = last_pixel[3]
 			offset += 2
-		} else if current_byte >> 6 == 0b11 { // QOI_OP_RUN
+		} else if current_u8 >> 6 == 0b11 { // QOI_OP_RUN
 			$if vqoi_debug ? {
-				eprintln('decode: QOI_OP_RUN len=${1 + current_byte & 0b0011_1111}')
+				eprintln('decode: QOI_OP_RUN len=${1 + current_u8 & 0b0011_1111}')
 			}
-			for _ in 0 .. 1 + current_byte & 0b0011_1111 {
+			for _ in 0 .. 1 + current_u8 & 0b0011_1111 {
 				$if vqoi_debug ? {
 					eprintln('decode: => $last_pixel')
 				}

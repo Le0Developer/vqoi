@@ -1,5 +1,7 @@
 // tested with https://qoiformat.org/qoi_test_images.zip
 
+module main
+
 import os
 import vqoi
 

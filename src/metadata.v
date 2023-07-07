@@ -3,7 +3,7 @@ module vqoi
 import encoding.binary
 
 // "qoif"
-const magic_header = [byte(113), 111, 105, 102]
+const magic_header = [u8(113), 111, 105, 102]
 
 
 pub struct ImageMetadata {
@@ -14,27 +14,27 @@ pub mut:
 	colorspace ColorSpace
 }
 
-pub fn (img ImageMetadata) as_header() []byte {
-	mut data := []byte{}
+pub fn (img ImageMetadata) as_header() []u8 {
+	mut data := []u8{}
 	data << magic_header
 
-	mut temp := []byte{len: 4}
+	mut temp := []u8{len: 4}
 	binary.big_endian_put_u32(mut temp, img.width)
 	data << temp
 	binary.big_endian_put_u32(mut temp, img.height)
 	data << temp
 
-	data << byte(img.channels)
-	data << byte(img.colorspace)
+	data << u8(img.channels)
+	data << u8(img.colorspace)
 
 	return data
 }
 
 
-pub fn metadata_from_header(data []byte) ?ImageMetadata {
+pub fn metadata_from_header(data []u8) !ImageMetadata {
 	for i, value in magic_header {
 		if data[i] != value {
-			return error('image is missing magic header bytes')
+			return error('image is missing magic header u8s')
 		}
 	}
 	width := binary.big_endian_u32(data[4..8])
@@ -50,7 +50,7 @@ pub fn metadata_from_header(data []byte) ?ImageMetadata {
 		return error('only supports colorspaces 0 or 1, not $colorspace')
 	}
 
-	return ImageMetadata{width, height, Channel(channels), ColorSpace(colorspace)}
+	return unsafe { ImageMetadata{width, height, Channel(channels), ColorSpace(colorspace)} }
 }
 
 pub enum Channel {
