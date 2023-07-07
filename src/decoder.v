@@ -56,11 +56,11 @@ pub fn decode(data []u8) !Image {
 			$if vqoi_debug ? {
 				eprintln('decode: QOI_OP_LUME')
 			}
-			next_u8 := data[offset + 1]
+			next_byte := data[offset + 1]
 			vg := (current_byte & 0x3f) - 32
-			new_pixel[0] = last_pixel[0] + vg - 8 + (next_u8 >> 4 & 0b0000_1111)
+			new_pixel[0] = last_pixel[0] + vg - 8 + (next_byte >> 4 & 0b0000_1111)
 			new_pixel[1] = last_pixel[1] + vg
-			new_pixel[2] = last_pixel[2] + vg - 8 + (next_u8 & 0b0000_1111)
+			new_pixel[2] = last_pixel[2] + vg - 8 + (next_byte & 0b0000_1111)
 			new_pixel[3] = last_pixel[3]
 			offset += 2
 		} else if current_byte >> 6 == 0b11 { // QOI_OP_RUN
