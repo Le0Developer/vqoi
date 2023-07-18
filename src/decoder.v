@@ -12,6 +12,7 @@ pub fn decode(data []u8) !Image {
 	mut offset := 14
 
 	mut last_pixel := [u8(0), 0, 0, 255]!
+	array[color_hash(last_pixel)] = last_pixel
 
 	for offset < data.len - 8 && pixels.len < total_pixels {
 		current_byte := data[offset]
